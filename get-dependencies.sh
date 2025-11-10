@@ -4,6 +4,7 @@ set -eu
 
 ARCH="$(uname -m)"
 EXTRA_PACKAGES="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/get-debloated-pkgs.sh"
+PACKAGE_BUILDER="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/make-aur-package.sh"
 
 echo "Installing build dependencies..."
 echo "---------------------------------------------------------------"
@@ -28,21 +29,8 @@ chmod +x ./get-debloated-pkgs.sh
 
 echo "Building pinta..."
 echo "---------------------------------------------------------------"
-sed -i -e 's|EUID == 0|EUID == 69|g' /usr/bin/makepkg
-sed -i \
-	-e 's|-O2|-O3|'                              \
-	-e 's|MAKEFLAGS=.*|MAKEFLAGS="-j$(nproc)"|'  \
-	-e 's|#MAKEFLAGS|MAKEFLAGS|'                 \
-	/etc/makepkg.conf
-cat /etc/makepkg.conf
-
-git clone --depth 1 https://aur.archlinux.org/pinta.git ./pinta
-(
-	cd ./pinta
-	sed -i -e "s|x86_64|$ARCH|" ./PKGBUILD
-	makepkg -fs --noconfirm
-	ls -la ./
-	pacman --noconfirm -U ./*.pkg.tar.*
-)
+wget --retry-connrefused --tries=30 "$PACKAGE_BUILDER" -O ./make-aur-package.sh
+chmod +x ./make-aur-package.sh
+./make-aur-package.sh pinta
 
 pacman -Q pinta | awk '{print $2; exit}' > ~/version
