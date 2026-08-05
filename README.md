@@ -15,6 +15,8 @@
 | :---: | :---: |
 | [Click here](https://github.com/pkgforge-dev/Pinta-AppImage/releases/latest) | [Click here](https://github.com/PintaProject/Pinta) |
 
+[**Looking for the GTK3 version of Pinta?**](https://github.com/pkgforge-dev/Pinta-GTK3-AppImage)
+
 </div>
 
 ---
