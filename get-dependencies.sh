@@ -16,8 +16,14 @@ echo "---------------------------------------------------------------"
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
 export DOTNET_NOLOGO=1
 
-git clone --depth 1 --branch 3.1.2 https://github.com/PintaProject/Pinta.git ./pinta-src && (
+git clone https://github.com/PintaProject/Pinta.git ./pinta-src && (
 	cd ./pinta-src
+
+	git fetch --tags origin
+	TAG=$(git tag --sort=-v:refname | grep -vi 'rc\|alpha\|beta\|nightly\|preview' | head -1)
+	git checkout "$TAG"
+	echo "$TAG" > ~/version
+
 	# The 3.1.2 release targets net8.0; match the Arch package by bumping to net10.0
 	sed -i 's/net8.0/net10.0/g' Directory.Build.props
 
@@ -60,8 +66,6 @@ git clone --depth 1 --branch 3.1.2 https://github.com/PintaProject/Pinta.git ./p
 	cp -r /usr/lib/pinta/icons/hicolor /usr/share/icons
 	sed 's/^_//' ./xdg/com.github.PintaProject.Pinta.desktop.in > /usr/share/applications/Pinta.desktop
 	cp -r /usr/lib/pinta/locale/. /usr/share/locale
-
-	awk -F'<|>' '/<Version>/{print $3; exit}' ./Directory.Build.props | sed 's/\.0$//' > ~/version
 )
 
 echo "Building libappstream stub..."
